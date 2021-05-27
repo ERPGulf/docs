@@ -1,0 +1,214 @@
+{%  
+        
+let report_columns = report.get_columns_for_print();
+report_columns = report_columns.filter(col => !col.hidden);
+            
+if (report_columns.length > 12) {
+frappe.throw(__("Too many columns. Export the report and print it using a spreadsheet application."));
+}           
+            
+                
+console.log('Report : ',report);
+let raw_data = report.raw_data;
+console.log('Raw data : ',raw_data);
+
+let emp_data = raw_data.skip_total_row.emp_data;
+console.log('Emp data : ',emp_data);
+
+    
+
+%}
+
+<style>
+    .financial-statements-important td {
+        font-weight: bold;
+    }           
+            
+    .financial-statements-blank-row td {
+        height: 37px;
+    }           
+            
+    .my-style {
+        font-style: italic !important;
+        background-color: blue !important;
+        font-weight: bold;
+    }
+</style>
+
+<h2 class="text-center">{%= __(report.report_name) %}</h2>
+<h3 class="text-center">{%= filters.company %}</h3>
+    
+{% if 'cost_center' in filters %}
+<h3 class="text-center">{%= filters.cost_center %}</h3>
+{% endif %}
+
+<h3 class="text-center">{%= filters.fiscal_year %}</h3>
+<h5 class="text-center">
+    {%= __("Currency") %} : {%= filters.presentation_currency || erpnext.get_currency(filters.company) %}
+</h5>
+{% if (filters.from_date) { %}
+<h5 class="text-center">
+    {%= frappe.datetime.str_to_user(filters.from_date) %} - {%= frappe.datetime.str_to_user(filters.to_date) %}
+</h5>
+{% } %}
+<hr>
+<table class="table table-bordered table-striped">
+
+ <thead>
+        <tr>
+            <th class="my-style" style="width: {%= 100 - (report_columns.length - 1) * 13 %}%;"></th>
+            {% for (let i=1, l=report_columns.length; i<l; i++) { %} {%if(report_columns[i].label=='Location' ){ %} <th
+                class="text-danger text-right">{%=report_columns[i].label %}</th>
+                {% } %}
+                {%if(report_columns[i].label!='Location'){ %}
+                <th class="my-style text-success text-left">{%=report_columns[i].label %}</th>
+                {% } %}
+                {% } %}
+        </tr>
+
+
+    </thead>
+
+
+    <tbody>
+        {% for(let i=0;i<data.length;i++) { %} {% const row=data[i]; %} <tr>
+
+            {% for(let j=0;j<report_columns.length;j++){ %} <td>
+
+                {% const fieldname = report_columns[j].fieldname; %}
+
+                {% if (!is_null(row[fieldname])) { %}
+
+                {%= frappe.format(row[fieldname], report_columns[j], {}, row) %}
+
+                {% } %}
+
+                </td>
+
+                {% } %}
+
+                </tr>
+
+
+                {% } %}
+    </tbody>
+
+</table>
+
+
+<hr>
+
+<table class="table table-striped table-bordered">
+
+    <thead>
+        <tr>
+            <th>
+                Name
+            </th>
+            <th>
+                DOB
+            </th>
+            <th>
+                Date of join
+            </th>
+        </tr>
+    </thead>
+
+
+    <tbody>
+
+    {%  for(let i=0;i<emp_data.length;i++)   { %}
+
+        {% const local_emp_data =emp_data[i] %}
+
+        <tr>
+
+            <td>
+                {%= local_emp_data.first_name %}
+            </td>
+
+            <td>
+                {%= local_emp_data.dob %}
+            </td>
+
+            <td>
+                {%= local_emp_data.date_of_join %}
+            </td>
+
+        </tr>
+
+    {% } %}
+
+    </tbody>
+
+
+</table>
+
+
+
+<small class="text-right text-left" style="font-style: italic;">
+    Note: {%= raw_data.skip_total_row.condition_text %}
+</small>
+
+
+<p class="text-right text-muted">
+    Printed On {%= frappe.datetime.str_to_user(frappe.datetime.get_datetime_as_string()) %}
+</p>
+
+
+    <thead>
+        <tr>
+            <th>
+                Name
+            </th>
+            <th>
+                DOB
+            </th>
+            <th>
+                Date of join
+            </th>
+        </tr>
+    </thead>
+
+
+    <tbody>
+
+    {%  for(let i=0;i<emp_data.length;i++)   { %}
+
+        {% const local_emp_data =emp_data[i] %}
+
+        <tr>
+
+            <td>
+                {%= local_emp_data.first_name %}
+            </td>
+
+            <td>
+                {%= local_emp_data.dob %}
+            </td>
+
+            <td>
+                {%= local_emp_data.date_of_join %}
+            </td>
+
+        </tr>
+
+    {% } %}
+
+    </tbody>
+
+
+</table>
+
+
+
+
+<small class="text-right text-left" style="font-style: italic;">
+    Note: {%= raw_data.skip_total_row.condition_text %}
+</small>
+
+
+<p class="text-right text-muted">
+    Printed On {%= frappe.datetime.str_to_user(frappe.datetime.get_datetime_as_string()) %}
+</p>
+                                                                                                                                                                                                 156,1         Bot
